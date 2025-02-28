@@ -11,7 +11,7 @@ const fetchData = async (url) => {
 
     const cacheControl = response.headers.get('cache-control');
    
-    const elapsedTime = Date.now() - startTime; // Calculate the time taken to fetch
+    const elapsedTime = Date.now() - startTime;
 
     console.log('Response Status:', response.status);
     console.log('Cache-Control Header:', cacheControl);
@@ -32,25 +32,25 @@ const url = 'http://localhost:3000/data';
 const testCaching = async () => {
   const url = 'http://localhost:3000/data';
 
-  // First request
+ 
   await fetchData(url);
 
-  // Wait 100ms before second request
+
   await new Promise(resolve => setTimeout(resolve, 100));
 
-  // Second request
+
   await fetchData(url);
 
-  // Wait 500ms before third request
+ 
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // Third request
+
   await fetchData(url);
 
-   // Wait 500ms before third request
+
    await new Promise(resolve => setTimeout(resolve, 500));
 
-   // Third request
+ 
    await fetchData(url);
 };
 
