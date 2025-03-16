@@ -1,3 +1,9 @@
+Background: An event management system allows users to view available events, make reservations, pay for tickets, and receive notifications. Each event has specific seat allocations, which need real-time updates. Cancellations should be handled with refund options, and users must be notified of successful reservations or cancellations. 
+
+Question: What are the classes you might need in this software solution?
+
+
+
 Class User {
     private name: string;
     private id: number;
