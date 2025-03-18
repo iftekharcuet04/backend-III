@@ -1,0 +1,206 @@
+Background: An event management system allows users to view available events, make reservations, pay for tickets, and receive notifications. Each event has specific seat allocations, which need real-time updates. Cancellations should be handled with refund options, and users must be notified of successful reservations or cancellations. 
+
+Question: What are the classes you might need in this software solution?
+
+
+
+Class User {
+    private name: string;
+    private id: number;
+    private bookingIds: string[]=[];
+    constructor (name, id){
+        this.name = name;
+        this.id = id;
+       
+    }
+    addbookingbookingId){
+        this.bookingIds.push(bookingId);
+    }
+    removeBooking(bookingId: string) {
+        this.bookingIds = this.bookingIds.filter(id => id !== bookingId);
+    }
+}
+
+
+Interface IPayment{
+    pay()
+    refund()
+}
+
+Interface INotification{
+    send()
+}
+
+
+Class Payment implements IPayment{
+    private price;
+    constructor(price){
+        this.price = price;
+    }
+    pay(){
+      
+        return true;
+    }
+
+    refund(){
+        return true;
+    }
+
+}
+
+
+
+Class PaymentProcessor implements IPayment{
+  payment: Payment;
+
+    constructor(payment){
+        this.payment = payment;
+    }
+    pay(){
+       
+        return  this.payment.pay();
+    }
+
+    refund(){
+        
+        return this.payment.refund();
+    }
+}
+
+
+Class Notification implements INotification{
+    message: string;
+    setMessage(message){
+        this.message = message;
+    }
+
+    send(){
+        return true;
+    }
+}
+
+Class NotificationProcessor implements INotification{
+
+    notification: Notification;
+
+    constructor(notification){
+        this.notification = notification
+    }
+    send(){
+        return this.notification.send()
+    }
+}
+
+Class Event{
+    private name: string;
+    private eventId: number;
+    private price: number;
+    private seatAvailable: number;
+    constructor(name, eventId, price, seatAvailable){
+        this.name = name;
+        this.eventId = eventId;
+        this.price =price;
+        this.seatAvailable = seatAvailable;
+    }
+
+    updateSeats(seatNumber){
+        this.seatAvailable-=seatNumber;
+    }
+    cancelSeats(seatNumber){
+        this.seatAvailable+=seatNumber;
+    }
+
+}
+
+Class EventManageMent{
+    private events: Event[];
+    private booking: Booking[];
+
+    notification1 = new Notification()
+
+    add(event: Event){
+        this.events.push(event);
+    }
+
+    getAllEvents(){
+        return this.events;
+    }
+
+    booking(book){
+      
+        this.booking.push(book);
+         notification1.setMessage("Successfully Booking")
+    }
+
+    cancel(bookingId){
+      
+        bookingIndex = this.bookings.findIndex(b => b.bookingId === bookingId);
+        if (bookingIndex !== -1) {
+            this.bookings.splice(bookingIndex, 1); 
+        }
+    
+    }
+}
+
+Class Booking{
+    private bookingId:string;
+    private seat: number;
+    private userId: number;
+    private eventId: number;
+
+    constructor() {
+        this.bookingId = UUID();
+    }
+       
+    book(event, userId, numberOfSeat){
+        this.seat = numberOfSeat;
+        this.userId = userId;
+        this.eventId = event.eventId;
+        event.updateSeats(numberOfSeat);
+
+        return this.bookingId;
+
+    }
+
+     cancel(event, userId, numberOfSeat){
+        this.seat = numberOfSeat;
+        this.userId = userId;
+        this.eventId = event.eventId;
+        event.cancelSeats(numberOfSeat);
+        notification1.setMessage("Failed Booking")
+        return this.bookingId;
+
+    }
+
+}
+
+main (){
+    event =  new Event("circus", 1, 10, 100);
+
+    eventManageMent = new EventManageMent();
+    eventManageMent.add(event);
+    eventManageMent.getAllEvents();
+
+    user = new User ("iftekhar", 1);
+
+    booking = new Booking();
+
+    payment1 = new Payment(event.price);
+
+    paymentProcessor = new PaymentProcessor(payment1)
+
+    if(paymentProcessor.pay()){
+        booking.book(event, user.id, 2);
+        user.addbooking(booking.bookingId);
+
+        eventManageMent.booking(booking);
+       
+    }
+    else{
+        paymentProcessor.refund();
+        eventManageMent.cancel(booking.bookingId);
+        user.removeBooking(booking.bookingId);
+        booking.cancel(event, user.id, 2);
+       
+    }
+}
