@@ -50,18 +50,18 @@ class Payment implements IPayment{
 
 
 
-class PaymentProcessor implements IPayment{
-  payment: Payment;
+class PaymentProcessor{
+  payment: IPayment;
 
     constructor(payment){
         this.payment = payment;
     }
-    pay(): string{
+    processPayment(): string{
        
         return  this.payment.pay();
     }
 
-    refund(paymentid){
+    processRrefund(paymentid){
         
         return this.payment.refund(paymentid);
     }
@@ -79,14 +79,14 @@ class Notification implements INotification{
     }
 }
 
-class NotificationProcessor implements INotification{
+class NotificationProcessor{
 
-    notification: Notification;
+    notification: INotification;
 
     constructor(notification){
         this.notification = notification
     }
-    send(message){
+    sendMessage(message){
         return this.notification.send(message)
     }
 }
@@ -106,7 +106,7 @@ class Order {
 
     setStatus(status, message){
         this.order.status = status;
-        this.notification.send(message);
+        this.notification.sendMessage(message);
     }
 
     setPayment(paymentid){
@@ -181,7 +181,7 @@ main(){
                 payment1 = new Payment(item.price);
 
                 paymentProcessor = new PaymentProcessor(payment1);
-                const paymentid =   paymentProcessor.pay();
+                const paymentid =   paymentProcessor.processPayment();
 
                 if(paymentid){
                     try{
@@ -192,7 +192,7 @@ main(){
                         order.setPayment(paymentid)
                     }
                     catch(error){
-                        paymentProcessor.refund(paymentid);
+                        paymentProcessor.processRrefund(paymentid);
                     }        
 
                 } 
