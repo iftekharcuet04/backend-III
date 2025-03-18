@@ -1,0 +1,205 @@
+
+
+type ItemType={
+    id: string,
+    name: string,
+    price: number,
+    quantity: number
+}
+
+type OrderType ={
+    id: string,
+    itemId: number,
+    numberOfItem: number,
+   
+    status: string,
+    paymentid?:string,
+}
+
+
+
+interface IPayment{
+    pay()
+    refund()
+}
+
+interface INotification{
+    send()
+}
+
+
+class Payment implements IPayment{
+    private price;
+    constructor(price){
+        this.price = price;
+    }
+    pay(){
+      
+        return true;
+    }
+
+    refund(){
+        return true;
+    }
+
+}
+
+
+
+class PaymentProcessor implements IPayment{
+  payment: Payment;
+
+    constructor(payment){
+        this.payment = payment;
+    }
+    pay(): string{
+       
+        return  this.payment.pay();
+    }
+
+    refund(paymentid){
+        
+        return this.payment.refund(paymentid);
+    }
+}
+
+
+class Notification implements INotification{
+    message: string;
+    setMessage(message){
+        this.message = message;
+    }
+
+    send(){
+        return true;
+    }
+}
+
+class NotificationProcessor implements INotification{
+
+    notification: Notification;
+
+    constructor(notification){
+        this.notification = notification
+    }
+    send(message){
+        return this.notification.send(message)
+    }
+}
+ 
+
+
+
+
+class Order {
+    private order:OrderType;
+    private notification;
+
+    constructor(order:OrderType, notification){
+        this.order = order;
+        this.notification = notification;
+    }
+
+    setStatus(status, message){
+        this.order.status = status;
+        this.notification.send(message);
+    }
+
+    setPayment(paymentid){
+        this.order.paymentid = paymentid;
+    }
+
+}
+
+
+
+class Store{
+    private inventories:ItemType[] = [];
+    private orderIds:string[] = [];
+
+    addItems (itemId, numberOfItem, name, price){
+
+        if(this.inventories.find(item => item.id === itemId)){
+                item.quantity+=numberOfItem;
+                item.name= name;
+                item.price = price;
+                
+        }
+        else{
+        const inventory = {
+                id: generateUid(),
+                name: name,
+                price : price,
+                quantity : numberOfItem
+                  }
+            this.inventories.push(inventory);
+        }
+       
+    }
+
+    decreaseItems(itemId, numberOfItem){
+            item = this.inventories.find(item => item.id === itemId);
+            if(item){
+                item.quantity-=numberOfItem;
+            }
+                
+     
+    }
+
+    hasItem(itemId){
+        return this.inventories.find(item => item.id === itemId);
+    }
+
+    buyItems(itemId, numberOfItem, orderId, paymentid){
+        this.decreaseItems(itemId, numberOfItem);
+        this.orderIds.push(orderId);
+    }
+
+   
+
+}
+
+
+
+main(){
+
+        const ItemTobeOrdered = "a6df";
+        const numberOfItem = 4;
+        const store = new Store();
+        const item = store.hasItem(ItemTobeOrdered);
+        if(item){
+            
+            const orderId = generateUid();
+            notification1 = new NotificationProcessor(new Notification());
+            
+            const order = new Order(orderId, ItemTobeOrdered, numberOfItem, "orderPlaced", notification1);
+            if(order){
+                payment1 = new Payment(item.price);
+
+                paymentProcessor = new PaymentProcessor(payment1);
+                const paymentid =   paymentProcessor.pay();
+
+                if(paymentid){
+                    try{
+                        order.setStatus("Paid", "Paid Successfully");
+                        store.buyItems(item.id, numberOfItem, order.id, paymentid);
+                
+                        order.setStatus("Purchased", "Successfully Purchased");
+                        order.setPayment(paymentid)
+                    }
+                    catch(error){
+                        paymentProcessor.refund(paymentid);
+                    }        
+
+                } 
+
+            }
+            
+
+                                                 
+        }
+        
+
+}
+
+
