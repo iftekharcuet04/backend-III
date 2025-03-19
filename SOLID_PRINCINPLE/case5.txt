@@ -191,7 +191,7 @@ main(){
 
                 if(paymentid){
                     try{
-                        order.setStatus("Paid", "Successfully Purchased");
+                        order.setStatus("Paid", "Successfully Paid");
                         store.buyItems(item.id, numberOfItem, order.id, paymentid);
                 
                         order.setStatus("Purchased", "Successfully Purchased");
