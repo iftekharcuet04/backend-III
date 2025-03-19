@@ -92,21 +92,27 @@ class NotificationProcessor{
 }
  
 
+// it's just a sample
+ new Worker("notificationQueue", async (job) => {
+  const { order, message } = job.data;
+  const processor = new NotificationProcessor();
+  await processor.processNotification(order, message);
+});
+
 
 
 
 class Order {
     private order:OrderType;
-    private notification;
+    private notificationQueue;
 
-    constructor(order:OrderType, notification){
+    constructor(order:OrderType){
         this.order = order;
-        this.notification = notification;
     }
 
     setStatus(status, message){
         this.order.status = status;
-        this.notification.sendMessage(message);
+        this.notificationQueue.add("status",  this.order, message);
     }
 
     setPayment(paymentid){
@@ -174,9 +180,9 @@ main(){
         if(item){
             
             const orderId = generateUid();
-            notification1 = new NotificationProcessor(new Notification());
             
-            const order = new Order(orderId, ItemTobeOrdered, numberOfItem, "orderPlaced", notification1);
+            const order = new Order(orderId, ItemTobeOrdered, numberOfItem);
+             order.setStatus("orderPlaced", "Successfully orderPlaced");
             if(order){
                 payment1 = new Payment(item.price);
 
@@ -185,7 +191,7 @@ main(){
 
                 if(paymentid){
                     try{
-                        order.setStatus("Paid", "Paid Successfully");
+                        order.setStatus("Paid", "Successfully Purchased");
                         store.buyItems(item.id, numberOfItem, order.id, paymentid);
                 
                         order.setStatus("Purchased", "Successfully Purchased");
