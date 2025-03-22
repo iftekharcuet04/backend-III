@@ -10,8 +10,14 @@ Interface ISubTitlAble{
     showSubTitle()
 }
 
+IMediaFie {
+play();
+pause();
+stop();
 
-class MediaFile{
+}
+
+class MediaFile IMediaFie{
     media:string;
 
     constructor(media){
@@ -50,15 +56,16 @@ class VideoFile extends MediaFile implements ISubTitlAble{
 
 
 class MediaPlayer(){
-    private mediaFiles: MediaFile[]=[];
+    private mediaFiles: IMediaFie[]=[];
    
-    addMediaFiles(mediFile){
-        this.push(mediFile);
+    addMediaFiles(mediaFile){
+        this.push(mediaFile);
     }
 
     iSubTitlAblable(mediaFile){
         return typeof mediaFile.showSubTitle === "function";
     }
+
     play(){
 
         for (const mediaFile of this.mediaFiles){
