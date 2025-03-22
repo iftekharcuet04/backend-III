@@ -1,0 +1,145 @@
+Background: A vehicle tracking system calculates the speed for various vehicle types (e.g., bikes, cars, airplanes). The base Vehicle class defines basic speed-related methods, and subclasses such as Bike, Car, and Airplane may need different speed limit handling. The system should calculate speeds consistently across all vehicle types.
+
+Question: How would you design the Vehicle and its subclasses to allow consistent speed calculations without needing different handling for each type?
+
+
+
+interface IAirSpeedLimitDecider{
+
+    airplanesSpeedLimit(airSpeed, temp, height):void;
+
+}
+
+interface IVehicle {
+
+    accelerate(speed);
+    brake(speed);
+    getSpeed();
+    getLimit();
+}
+
+class Vehicle implements IVehicle{
+
+    private speedLimit;
+    private speed;
+
+    constructor(speedLimit){
+        this.speedLimit = speedLimit;
+        this.speed = 0;
+    }
+
+    accelerate(speed){
+        this.speed+=speed;
+    }
+
+    brake(speed){
+       this.speed = Math.max(0, this.speed - speed);
+    }
+
+    getSpeed(){
+        return this.speed;
+    }
+
+    getLimit(){
+        return this.speedLimit;
+    }
+}
+
+class Bike extends Vehicle{
+
+    constructor(speedLimit){
+        super (speedLimit)
+    }
+}
+
+class Car extends Vehicle{
+
+    constructor(speedLimit){
+        super (speedLimit)
+    }
+}
+
+class Airplane extends Vehicle implements IAirSpeedLimitDecider{
+
+    constructor(speedLimit){
+        super (speedLimit)
+    }
+
+    airplanesSpeedLimit(airSpeed, temp, height){
+        this.speed = airSpeed/(temp*height);
+    }
+}
+
+class SpeedRegulator {
+
+    speedLimitHandler(vehicle:IVehicle){
+    if(this.isAirSpeedLimitDecider(vehicle)){
+                vehicle.airplanesSpeedLimit(this.airSpeed, this.temp, this.height)
+            }
+
+            if(vehicle.getSpeed() >  vehicle.getLimit()){
+                vehicle.brake(vehicle.getSpeed() -  vehicle.getLimit())
+            }
+    }
+
+}
+
+class VehicleTracker{
+
+    private vehicles:IVehicle[]=[];
+    private speedRegulator = new SpeedRegulator();
+    private airSpeed;
+    private temp;
+    private height;
+
+    setTemp(temp){
+        this.temp = temp;
+    }
+
+    setHeight(height){
+        this.height = height;
+    }
+
+    setAirSpeed(airSpeed){
+        this.airSpeed = airSpeed;
+    }
+
+    addVehicles(vehicle){
+        this.vehicles.push(vehicle);
+    }
+
+    isAirSpeedLimitDecider(vehicle: any): vehicle is IAirSpeedLimitDecider {
+         return typeof vehicle.airplanesSpeedLimit === "function";
+    }
+
+
+    speedLimitHandler(){
+
+        for (const vehicle of this.vehicles){
+
+         this.speedRegulator.speedLimitHandler(vehicle);
+        }
+    }
+
+}
+
+main(){
+    const bike = new Bike(80);
+    const car = new Car(120);
+    const airplane = new Airplane(900);
+
+    bike.accelerate(100);
+    car.accelerate(110);
+    airplane.accelerate(950);
+
+    const tracker = new VehicleTracker();
+    tracker.addVehicle(bike);
+    tracker.addVehicle(car);
+    tracker.addVehicle(airplane);
+
+    tracker.setTemp(15);
+    tracker.setHeight(5000);
+    tracker.setAirSpeed(700);
+
+    tracker.speedLimitHandler();
+}

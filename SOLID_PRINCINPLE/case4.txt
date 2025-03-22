@@ -57,7 +57,7 @@ class MediaPlayer(){
     }
 
     iSubTitlAblable(mediaFile){
-        return "showSubTitle" in mediaFile;
+        return typeof mediaFile.showSubTitle === "function";
     }
     play(){
 
