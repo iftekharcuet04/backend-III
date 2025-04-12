@@ -1,0 +1,91 @@
+interface Payment {
+  process(amount: number): boolean;
+}
+
+interface Validator {
+  validate(): boolean;
+}
+
+// credit card Validator
+
+class CreditCardValidator implements Validator {
+  constructor(private cvv: string, private expiry: string) {}
+
+  validate(): boolean {
+    return this.verifyCVV() && this.verifyExpiry();
+  }
+
+  private verifyCVV(): boolean {
+    return this.cvv.length === 3;
+  }
+
+  private verifyExpiry(): boolean {
+    const now = new Date();
+    const [month, year] = this.expiry.split('/').map(Number);
+    const expiryDate = new Date(year + 2000, month, 0, 23, 59, 59, 999);
+    return expiryDate > now;
+  }
+}
+
+// Bank Transfer Validator
+class BankTransferValidator implements Validator {
+  constructor(private accountNumber: string) {}
+
+  validate(): boolean {
+    return this.accountNumber.length >= 10;
+  }
+}
+
+// Wallet Validator
+class WalletValidator implements Validator {
+  constructor(private contact: string) {}
+
+  validate(): boolean {
+    return this.contact.includes('@') || /^[0-9]{10}$/.test(this.contact);
+  }
+}
+
+class CreditCardPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing credit card payment: $${amount}`);
+    return true;
+  }
+}
+
+class BankTransferPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing bank transfer: $${amount}`);
+    return true;
+  }
+}
+
+class DigitalWalletPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing digital wallet payment: $${amount}`);
+    return true;
+  }
+}
+
+
+main(){
+
+    const ccPayment = new CreditCardPayment(new CreditCardValidator("123", "12/26"));
+    ccPayment.process(100);
+
+    const bankPayment = new BankTransferPayment(new BankTransferValidator("1234567890"));
+    bankPayment.process(200);
+
+    const walletPayment = new DigitalWalletPayment(new WalletValidator("user@example.com"));
+    walletPayment.process(50);
+
+}
+

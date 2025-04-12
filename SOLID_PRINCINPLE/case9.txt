@@ -1,0 +1,63 @@
+interface DiscountStrategy {
+  calculate(price: number, context: DiscountContext): number;
+}
+
+interface DiscountContext {
+  season?: string;
+  quantity?: number;
+  loyaltyPoints?: number;
+  [key: string]: any; // add this for further adding discount context
+}
+
+
+class SeasonalDiscount implements DiscountStrategy {
+  calculate(price: number, context: DiscountContext): number {
+    return context.season === 'Winter' ? price * 0.9 : price;
+  }
+}
+
+class LoyaltyDiscount implements DiscountStrategy {
+  calculate(price: number, context: DiscountContext): number {
+    return context.loyaltyPoints > 100 ? price * 0.85 : price;
+  }
+}
+
+class BulkPurchaseDiscount implements DiscountStrategy {
+  calculate(price: number, context: DiscountContext): number {
+    return context.quantity >= 10 ? price * 0.8 : price;
+  }
+}
+
+
+class DiscountService {
+  constructor(private strategies: DiscountStrategy[]) {}
+
+  applyDiscount(price: number, context: DiscountContext): number {
+    return this.strategies.reduce(
+      (currentPrice, strategy) => strategy.calculate(currentPrice, context),
+      price
+    );
+  }
+}
+
+
+const strategies: DiscountStrategy[] = [
+  new SeasonalDiscount(),
+  new LoyaltyDiscount(),
+  new BulkPurchaseDiscount(),
+ ....
+];
+
+const discountService = new DiscountService(strategies);
+
+main(){
+    const price = 100;
+    const context = {
+    season: "Winter",
+    quantity: 12,
+    loyaltyPoints: 120
+    };
+
+    const finalPrice = discountService.applyDiscount(price, context);
+    console.log(finalPrice);                                                                                                                                        
+}
