@@ -1,0 +1,127 @@
+interface Payment {
+  process(amount: number): boolean;
+}
+
+interface Validator {
+  validate(): boolean;
+}
+
+// credit card Validator
+
+class CreditCardValidator implements Validator {
+  constructor(private cvv: string, private expiry: string) {}
+
+  validate(): boolean {
+    return this.verifyCVV() && this.verifyExpiry();
+  }
+
+  private verifyCVV(): boolean {
+    return this.cvv.length === 3;
+  }
+
+  private verifyExpiry(): boolean {
+    const now = new Date();
+    const [month, year] = this.expiry.split('/').map(Number);
+    const expiryDate = new Date(year + 2000, month, 0, 23, 59, 59, 999);
+    return expiryDate > now;
+  }
+}
+
+// Bank Transfer Validator
+class BankTransferValidator implements Validator {
+  constructor(private accountNumber: string) {}
+
+  validate(): boolean {
+    return this.accountNumber.length >= 10;
+  }
+}
+
+// Wallet Validator
+class WalletValidator implements Validator {
+  constructor(private contact: string) {}
+
+  validate(): boolean {
+    return this.contact.includes('@') || /^[0-9]{10}$/.test(this.contact);
+  }
+}
+
+class CreditCardPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing credit card payment: ${amount}`);
+    return true;
+  }
+}
+
+class BankTransferPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing bank transfer: ${amount}`);
+    return true;
+  }
+}
+
+class DigitalWalletPayment implements Payment {
+  constructor(private validator: Validator) {}
+
+  process(amount: number): boolean {
+    if (!this.validator.validate()) return false;
+    console.log(`Processing digital wallet payment: ${amount}`);
+    return true;
+  }
+}
+
+type PaymentType = 'credit' | 'bank' | 'wallet';
+
+
+interface PaymentInfo {
+  type: PaymentType;
+  data: any;
+}
+
+class PaymentFactory {
+  static create(payment: PaymentInfo):Payment {
+    switch (payment.type) {
+      case 'credit':
+        return new CreditCardPayment(payment.data.cvv, payment.data.expiry);
+      case 'bank':
+        return new BankTransferPayment(payment.data.accountNumber);
+      case 'wallet':
+        return new DigitalWalletPayment(payment.data.contact);
+      default:
+        throw new Error("Unsupported payment type");
+    }
+  }
+}
+
+
+
+main(){
+
+  const creditPayment = PaymentFactory.create({
+    type: 'credit',
+    data: { cvv: '123', expiry: '12/26' }
+  });
+
+  creditPayment.process(100);
+
+  const bankPayment = PaymentFactory.create({
+    type: 'bank',
+    data: { accountNumber: '1234567890' }
+  });
+
+  bankPayment.process(200);
+
+  const walletPayment = PaymentFactory.create({
+    type: 'wallet',
+    data: { contact: 'iftekharcuet04@gmail.com' }
+  });
+
+  walletPayment.process(50);
+
+}
+

@@ -1,0 +1,73 @@
+interface Product {
+  getId(): string;
+  getName(): string;
+  getPrice(): number;
+}
+
+interface Shippable {
+  ship(address: string): void;
+}
+
+interface InventoryTrackable {
+  trackInventory(): number;
+}
+
+interface Downloadable {
+  downloadLink(): string;
+  licenseKey(): string;
+}
+
+interface Schedulable {
+  schedule(date: Date): void;
+}
+
+
+class PhysicalProduct implements Product, Shippable, InventoryTrackable {
+  getId() {
+     return "P001";
+      }
+  getName() {
+    return "Laptop"; 
+    }
+  getPrice() {
+     return 1200;
+      }
+
+  ship(address: string) { 
+    // shipping logic
+      }
+  trackInventory() {
+     return 25;
+      }
+
+class DigitalProduct implements Product, Downloadable {
+  getId() { 
+    return "D001";
+     }
+  getName() {
+     return "Ebook";
+      }
+  getPrice() {
+     return 20;
+    }
+
+  downloadLink() { 
+    return "downloadLink";
+     }
+  licenseKey() { 
+    return "licenseKey";
+     }
+}
+
+class ServiceProduct implements Product, Schedulable {
+  getId() { 
+    return "S001";
+     }
+  getName() {
+     return "Consultation"; }
+  getPrice() { return 150; }
+
+  schedule(date: Date) { 
+    // booking logic 
+    }
+}
